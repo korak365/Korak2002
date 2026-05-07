@@ -1,0 +1,17 @@
+{
+    "name": "ticket-price-arbitrage-scraper",
+    "version": "0.0.1",
+    "description": "Tracks ticket prices on primary and resale sites to detect arbitrage opportunities.",
+    "type": "module",
+    "engines": {
+        "node": ">=20.0.0"
+    },
+    "dependencies": {
+        "apify": "^3.4.2",
+        "crawlee": "^3.13.8"
+    },
+    "scripts": {
+        "start": "node src/main.js"
+    },
+    "license": "ISC"
+}

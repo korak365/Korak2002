@@ -1,0 +1,66 @@
+{
+    "actorSpecification": 1,
+    "fields": {
+        "event": {
+            "type": "string",
+            "title": "Event Name"
+        },
+        "primaryPrice": {
+            "type": "string",
+            "title": "Primary Seller Price"
+        },
+        "resalePrice": {
+            "type": "string",
+            "title": "Resale Site Price"
+        },
+        "difference": {
+            "type": "number",
+            "title": "Price Difference"
+        },
+        "primarySellerUrl": {
+            "type": "string",
+            "title": "Primary Seller URL"
+        },
+        "resaleSiteUrl": {
+            "type": "string",
+            "title": "Resale Site URL"
+        }
+    },
+    "views": {
+        "overview": {
+            "title": "Arbitrage Opportunities",
+            "transformation": {
+                "fields": ["event", "primaryPrice", "resalePrice", "difference", "primarySellerUrl", "resaleSiteUrl"]
+            },
+            "display": {
+                "component": "table",
+                "properties": {
+                    "event": {
+                        "label": "Event",
+                        "format": "text"
+                    },
+                    "primaryPrice": {
+                        "label": "Primary Price ($)",
+                        "format": "number"
+                    },
+                    "resalePrice": {
+                        "label": "Resale Price ($)",
+                        "format": "number"
+                    },
+                    "difference": {
+                        "label": "Price Gap ($)",
+                        "format": "number"
+                    },
+                    "primarySellerUrl": {
+                        "label": "Primary Seller URL",
+                        "format": "link"
+                    },
+                    "resaleSiteUrl": {
+                        "label": "Resale Site URL",
+                        "format": "link"
+                    }
+                }
+            }
+        }
+    }
+}

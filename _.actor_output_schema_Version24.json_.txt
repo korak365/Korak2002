@@ -1,0 +1,11 @@
+{
+    "actorOutputSchemaVersion": 1,
+    "title": "Output Schema for Ticket Arbitrage",
+    "properties": {
+        "overview": {
+            "type": "string",
+            "title": "Arbitrage Analysis",
+            "template": "{{links.apiDefaultDatasetUrl}}/items?view=overview"
+        }
+    }
+}

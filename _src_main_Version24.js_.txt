@@ -1,0 +1,121 @@
+// Import required modules
+import { Actor } from 'apify';
+import { CheerioCrawler, Dataset } from 'crawlee';
+
+await Actor.init();
+
+const { primarySellerUrls = [], resaleSiteUrls = [], maxTickets = 50 } = await Actor.getInput();
+
+// Helper function to extract price numbers
+const extractPrice = (priceStr) => parseFloat(priceStr.replace(/[^0-9.]/g, ''));
+
+// Crawler for primary sellers
+const primaryCrawler = new CheerioCrawler({
+    maxConcurrency: 5,
+    async requestHandler({ $, request, log }) {
+        log.info(`Fetching primary seller data: ${request.url}`);
+
+        const eventName = $('h1.event-title').text().trim(); // Update selector for event title
+        const tickets = $('.ticket-listing'); // Update selector for ticket listing
+
+        const ticketPrices = [];
+        for (const ticket of tickets.slice(0, maxTickets)) {
+            const price = $(ticket).find('.ticket-price').text(); // Update selector for ticket price
+            if (price) {
+                ticketPrices.push(extractPrice(price));
+            }
+        }
+
+        // Save unique ticket prices for the event
+        await Dataset.pushData({
+            type: 'primary',
+            event: eventName,
+            prices: ticketPrices,
+            url: request.url,
+        });
+    },
+});
+
+// Crawler for resale sites
+const resaleCrawler = new CheerioCrawler({
+    maxConcurrency: 5,
+    async requestHandler({ $, request, log }) {
+        log.info(`Fetching resale site data: ${request.url}`);
+
+        const eventName = $('h1.event-title').text().trim(); // Update selector for event title
+        const tickets = $('.ticket-listing'); // Update selector for ticket listing
+
+        const ticketPrices = [];
+        for (const ticket of tickets.slice(0, maxTickets)) {
+            const price = $(ticket).find('.ticket-price').text(); // Update selector for ticket price
+            if (price) {
+                ticketPrices.push(extractPrice(price));
+            }
+        }
+
+        // Save unique ticket prices for the event
+        await Dataset.pushData({
+            type: 'resale',
+            event: eventName,
+            prices: ticketPrices,
+            url: request.url,
+        });
+    },
+});
+
+log.info(`Starting primary seller crawl...`);
+for (const url of primarySellerUrls) {
+    primaryCrawler.addRequests([{ url }]);
+}
+
+log.info(`Starting resale site crawl...`);
+for (const url of resaleSiteUrls) {
+    resaleCrawler.addRequests([{ url }]);
+}
+
+await primaryCrawler.run();
+await resaleCrawler.run();
+
+// Aggregate data and find arbitrage opportunities
+const dataset = await Dataset.getData();
+const aggregatedData = dataset.items.reduce((agg, item) => {
+    if (!agg[item.event]) {
+        agg[item.event] = {};
+    }
+    if (item.type === 'primary') {
+        agg[item.event].primary = item;
+    } else if (item.type === 'resale') {
+        agg[item.event].resale = item;
+    }
+    return agg;
+}, {});
+
+// Analyze price gaps
+const arbitrageOpportunities = [];
+for (const [event, data] of Object.entries(aggregatedData)) {
+    if (data.primary && data.resale) {
+        const primaryPrices = data.primary.prices;
+        const resalePrices = data.resale.prices;
+
+        const primaryMin = Math.min(...primaryPrices);
+        const resaleMin = Math.min(...resalePrices);
+
+        const gap = resaleMin - primaryMin;
+
+        arbitrageOpportunities.push({
+            event,
+            primaryPrice: primaryMin,
+            resalePrice: resaleMin,
+            difference: gap,
+            primarySellerUrl: data.primary.url,
+            resaleSiteUrl: data.resale.url,
+        });
+    }
+}
+
+// Save arbitrage opportunities to a dataset
+for (const opportunity of arbitrageOpportunities) {
+    await Dataset.pushData(opportunity);
+}
+
+await Actor.exit();

@@ -1,0 +1,32 @@
+{
+    "title": "Input Schema for Event Ticketing Price Arbitrage",
+    "type": "object",
+    "schemaVersion": 1,
+    "properties": {
+        "primarySellerUrls": {
+            "title": "Primary Seller URLs",
+            "type": "array",
+            "description": "URLs of event ticket listings from primary sellers (e.g., Ticketmaster).",
+            "editor": "requestListSources",
+            "prefill": [
+                { "url": "https://www.ticketmaster.com/example-event" }
+            ]
+        },
+        "resaleSiteUrls": {
+            "title": "Resale Site URLs",
+            "type": "array",
+            "description": "URLs of resale platforms for the same event (e.g., StubHub).",
+            "editor": "requestListSources",
+            "prefill": [
+                { "url": "https://www.stubhub.com/example-event" }
+            ]
+        },
+        "maxTickets": {
+            "title": "Maximum Tickets to Scrape per Site",
+            "type": "integer",
+            "description": "Maximum number of ticket listings to scrape per site per event.",
+            "default": 50
+        }
+    },
+    "required": ["primarySellerUrls", "resaleSiteUrls"]
+}

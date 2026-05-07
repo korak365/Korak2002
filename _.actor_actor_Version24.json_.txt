@@ -1,0 +1,17 @@
+{
+    "actorSpecification": 1,
+    "name": "event-ticket-price-arbitrage",
+    "title": "Event Ticketing Price Arbitrage Scraper",
+    "description": "Monitors primary ticket sellers and resale platforms to find price gaps for arbitrage opportunities.",
+    "version": "0.0",
+    "meta": {
+        "templateId": "ai-generated-actor",
+        "generatedBy": "copilot-2026"
+    },
+    "input": "./input_schema.json",
+    "output": "./output_schema.json",
+    "storages": {
+        "dataset": "./dataset_schema.json"
+    },
+    "dockerfile": "../Dockerfile"
+}
